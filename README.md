@@ -28,8 +28,8 @@ The project explores the use of PINNs to solve the LLG equation by incorporating
    - **Long Short-Term Memory (LSTM) Recurrent Neural Networks:** Captures time-dependent patterns in the magnetization dynamics.  
 
 4. **Training & Evaluation:**  
-   - Models are trained using the **Adaptive Moments (Adam) optimizer**.  
-   - Hyperparameters such as the damping parameter \(\alpha\), number of collocation points, and training data size are optimized.  
+   - Models are trained using the **Adaptive Moments (Adam) optimizer**.
+   - Hyperparameters such as the damping parameter \(alpha\), number of collocation points, and training data size are optimized.  
    - The models are compared against traditional numerical solvers to evaluate accuracy and efficiency.  
 
 ---
@@ -37,14 +37,14 @@ The project explores the use of PINNs to solve the LLG equation by incorporating
 ## Results & Observations
 
 - **PINNs successfully model magnetization dynamics** but require careful tuning of hyperparameters.  
-- **Higher damping values (\(\alpha\)) lead to better convergence** in PINNs, while lower values introduce numerical instability.  
+- **Higher damping values (\(alpha\)) lead to better convergence** in PINNs, while lower values introduce numerical instability.  
 - **LSTM-based models outperform feed-forward networks** in multi-spin simulations due to their ability to capture sequential dependencies.  
 - **PINNs require significantly more computation time** than traditional ODE solvers but offer flexibility in handling irregular geometries and boundary conditions.  
 - **Performance degrades for high-dimensional spin networks**, requiring better optimization strategies.  
 
 ---
 
-## 🛠 Future Work
+## Future Work
 
 - **Optimize PINN architectures** to improve computational efficiency and training time.  
 - **Explore alternative loss functions** that better enforce the LLG equation constraints while reducing training instability.  
