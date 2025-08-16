@@ -1,53 +1,65 @@
-# Physics-Informed Neural Networks (PINNs) for Simulating the LLG Equation
+# Physics-Informed Neural Networks (PINNs) for High-Fidelity Landau-Lifshitz-Gilbert (LLG) Equation Simulation
+
+## Project Overview
 
 This repository contains the implementation of **Physics-Informed Neural Networks (PINNs)** to simulate the **Landau-Lifshitz-Gilbert (LLG) equation**. The LLG equation describes the dynamics of magnetization in ferromagnetic materials and is widely used in spintronics and magnonics research.
 
 ## Overview
+
 The project explores the use of PINNs to solve the LLG equation by incorporating physical laws into the loss function of a deep learning model. The neural network is trained to approximate magnetization dynamics while ensuring consistency with the governing PDE.
 
-### **Key Highlights**
-- **Multi-Layer Feed-Forward Neural Networks (MLFFNN)** and **Recurrent Neural Networks (LSTMs)** are used.
-- **Loss function** includes physical constraints such as PDE residuals and magnetization normalization.
-- **Comparison of PINNs with traditional numerical solvers (ODE solvers) for LLG simulations**.
-- **Evaluation of PINNs' effectiveness for multi-spin systems with interactions**.
+## Key Features
 
-## Methodology
+*   **Physics-Driven Loss Formulation:** A bespoke hybrid loss function meticulously designed to embed the LLG equation's dynamics. This loss comprises:
+    *   **Data Loss (\(MSE_u\)):** Minimizes the Mean Squared Error between the neural network's output and observed magnetization time-series data.
+    *   **Physics Residual Loss (\(Loss_{pde}\)):** Enforces the LLG equation as a hard constraint by penalizing deviations from its form, ensuring the model's predictions adhere to the fundamental physics.
+    *   **Normalization Constraint (\(Loss_{norm}\)):** Guarantees the physical validity of the magnetization vector by maintaining its unit norm \( (||m|| = 1) \).
+*   **Advanced Neural Network Architectures:** Implementation and comparative analysis of two distinct network types:
+    *   **Multi-Layer Feed-Forward Neural Networks (MLFFNNs):** Explored for their ability to learn complex non-linear mappings.
+    *   **Long Short-Term Memory (LSTM) Recurrent Neural Networks (RNNs):** Utilized for their exceptional capability in handling sequential data and capturing long-range temporal dependencies inherent in magnetization dynamics, especially crucial for multi-spin interactions where the output from one time step influences the next.
+*   **Complex Multi-Spin System Simulations:** Demonstrated the PINNs' capacity to simulate the time evolution of magnetization for systems involving multiple interacting spins arranged in various geometries (linear chains, triangles, squares, hexagons), a significant step towards realistic material modeling.
+*   **Hyperparameter Optimization:** Thorough investigation into the impact of critical parameters such as network depth (layers), width (neurons per layer), damping parameter (\(\alpha\)), training data size, and collocation point density on model accuracy and training efficiency.
 
-1. **Defining the Problem:**  
-   - The Landau-Lifshitz-Gilbert (LLG) equation is solved using neural networks.  
-   - The input to the model is time, and the output is the three components of magnetization \((m_x, m_y, m_z)\).  
-   - The model is trained to approximate the evolution of magnetization while ensuring it adheres to the LLG equation.  
+### Visualizing the Architectures:
 
-2. **Loss Function Design:**  
-   - **Mean Squared Error (MSE) on training data:** Ensures the model's predictions match the known solutions from numerical solvers.  
-   - **Physics residual loss:** Penalizes deviations from the LLG equation by including the PDE residual in the loss function.  
-   - **Normalization loss:** Enforces the physical constraint \(|m| = 1\), ensuring magnetization remains properly scaled.  
+![MLFFNN Architecture](figures/mlffnn.png)
+*Figure 3.1: Basic network architecture used for Multi-Layer Feed-Forward Neural Networks.*
 
-3. **Network Architectures:**  
-   - **Multi-Layer Feed-Forward Neural Networks (MLFFNN):** Standard deep learning model with multiple layers.  
-   - **Long Short-Term Memory (LSTM) Recurrent Neural Networks:** Captures time-dependent patterns in the magnetization dynamics.  
+![LSTM Block](figures/LSTM_block.png)
+*Figure 3.14: Internal workings of an LSTM block, illustrating its components for handling sequential data (from (6)).*
 
-4. **Training & Evaluation:**  
-   - Models are trained using the **Adaptive Moments (Adam) optimizer**.
-   - Hyperparameters such as the damping parameter \(alpha\), number of collocation points, and training data size are optimized.  
-   - The models are compared against traditional numerical solvers to evaluate accuracy and efficiency.  
+## Implementation Details
 
----
+The project leverages PyTorch's automatic differentiation capabilities to compute the necessary derivatives for the physics residual loss. Models were trained on a high-performance GPU, utilizing the Adam optimizer for efficient learning.
 
-## Results & Observations
+## Results & Insights
 
-- **PINNs successfully model magnetization dynamics** but require careful tuning of hyperparameters.  
-- **Higher damping values (\(alpha\)) lead to better convergence** in PINNs, while lower values introduce numerical instability.  
-- **LSTM-based models outperform feed-forward networks** in multi-spin simulations due to their ability to capture sequential dependencies.  
-- **PINNs require significantly more computation time** than traditional ODE solvers but offer flexibility in handling irregular geometries and boundary conditions.  
-- **Performance degrades for high-dimensional spin networks**, requiring better optimization strategies.  
+The PINN models successfully learn and simulate magnetization dynamics, demonstrating their potential for complex physical systems. Notably, the **LSTM-based architectures showed superior performance** compared to standard feed-forward networks, particularly in capturing the intricate temporal dependencies and interactions within multi-spin configurations.
 
----
+While PINNs offer remarkable flexibility for problems with non-trivial geometries and boundary conditions, the current implementations were found to be **computationally more intensive and, in some cases, less accurate than highly optimized traditional numerical ODE solvers** for the scales explored. This highlights an important trade-off: PINNs provide a powerful, generalized framework but may require significant computational resources and further optimization for direct competition with specialized solvers in specific, well-defined scenarios.
 
-## Future Work
+Future work aims to scale these models to even larger systems of interacting spins, exploring strategies to enhance their computational efficiency and accuracy to potentially surpass traditional methods.
 
-- **Optimize PINN architectures** to improve computational efficiency and training time.  
-- **Explore alternative loss functions** that better enforce the LLG equation constraints while reducing training instability.  
-- **Extend simulations to larger multi-spin systems** by using grid-based neural networks for improved scalability.  
-- **Combine PINNs with traditional solvers** to leverage the strengths of both data-driven and numerical approaches.  
-- **Investigate Transformer-based architectures** for better handling of long-range spin interactions in large-scale simulations.  
+### Simulation Examples & Performance:
+
+**Isolated Spin Simulation using LSTM:**
+![LSTM Isolated Spin Simulation](figures/lstm0d.jpg)
+
+*Figure 3.15: LSTM simulation for an Isolated Spin. The model (prediction) accurately tracks the true (ground truth) magnetization dynamics, demonstrating the network's foundational learning capability.*
+
+**Magnetization Dynamics of 6 Interacting Spins in a Hexagonal Arrangement:**
+![6 Spins Hexagon Simulation](figures/lstm6hex.jpg)
+
+*Figure 3.22: Simulation of magnetization for 6 spins arranged in a Hexagon, demonstrating the PINN's capacity to model complex interacting systems and predict their temporal evolution.*
+
+**Training Performance: Loss Convergence for Various LSTM Models:**
+![LSTM Loss Convergence](figures/lstmloss.jpg)
+
+*Figure 3.24: Log loss convergence during training for different LSTM models applied to various multi-spin configurations (e.g., 3 spins 1D, 6 spins 2D). This illustrates the training stability and performance across different problem complexities.*
+
+## Technologies
+
+*   **Python 3.10.13**
+*   **PyTorch 2.1.1:** Essential for building dynamic computational graphs and neural network models.
+*   **NumPy:** For efficient numerical operations and data manipulation.
+*   **Matplotlib:** For data visualization and plotting results.
